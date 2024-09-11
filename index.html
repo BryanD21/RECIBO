@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Recibo Mensualidad - LENSOR</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 150px; /* Aumentar el tamaño de la imagen */
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%; /* Ajustar el ancho completo */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: #004399;
+        }
+        .recibo {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            position: relative;
+            border-radius: 8px;
+            width: 80%;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            display: none; /* Comenzar oculto */
+            text-align: left; /* Alinear el texto a la izquierda */
+        }
+        .recibo h2 {
+            text-align: center;
+            color: #0056b3;
+        }
+        .recibo .details {
+            margin: 10px 0;
+        }
+        .recibo .details p {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+        .recibo .details .data {
+            font-weight: bold;
+        }
+        .recibo .thank-you {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .recibo .note {
+            text-align: center;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 10px;
+        }
+        .recibo .company-info {
+            text-align: center;
+            font-size: 0.8em;
+            color: #888;
+            margin: 10px 0;
+        }
+        .recibo .company-name {
+            text-align: center;
+            font-size: 1.2em;
+            color: #0056b3; /* Color azul */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <img src="logo-lensor2.png" alt="Logo LENSOR">
+    </div>
+    <h1>Generar Recibo Mensualidad</h1>
+
+    <form id="reciboForm">
+        <label for="nombreCliente">Nombre del Cliente</label>
+        <input type="text" id="nombreClienteMensualidad" name="nombreClienteMensualidad" pattern="[A-Za-z\s]+" required
+               title="Solo se permiten letras y espacios en blanco">
+
+        <label for="cuotaNumero">Cuota #</label>
+        <select id="cuotaNumero" name="cuotaNumero" required>
+            <option value="">Seleccione</option>
+            <script>
+                for (let i = 1; i <= 24; i++) {
+                    document.write(`<option value="${i}">${i}</option>`);
+                }
+            </script>
+        </select>
+
+        <label for="costoEquipo">Costo Total del Equipo (Q)</label>
+        <input type="number" id="costoEquipo" name="costoEquipo" required>
+
+        <label for="montoCuota">Monto de la Cuota (Q)</label>
+        <input type="number" id="montoCuota" name="montoCuota" required>
+
+        <label for="contacto">Contacto (Teléfono)</label>
+        <input type="tel" id="contacto" name="contacto" required pattern="\+502[0-9]{8}"
+               title="Debe comenzar con +502 y estar seguido de 8 números">
+
+        <label for="fechaPago">Fecha de Pago</label>
+        <input type="date" id="fechaPago" name="fechaPago" required>
+
+        <label for="saldoRestante">Saldo Restante (Q)</label>
+        <input type="text" id="saldoRestante" name="saldoRestante" readonly>
+
+        <button type="button" class="button" onclick="generarRecibo()">Generar Recibo</button>
+        <button type="button" class="button" style="background-color: #28a745;" onclick="descargarImagen()">Descargar como Imagen</button>
+    </form>
+
+    <div class="recibo" id="recibo">
+        <div class="content">
+            <h2 id="tituloGenerado">Recibo de LENSOR - Mensualidad</h2>
+            <div class="details" id="detalleRecibo"></div>
+            <p class="thank-you">Gracias por su compra</p>
+            <p class="company-info">Dirección: 6Ta Av 6-92 Zona 1 Escuintla.<br>Teléfono: +502 5871-0789</p>
+            <p class="note">DESPUÉS DE 3 MESES SIN PAGO ALGUNO, AUTOMÁTICAMENTE SE DARÁ DE BAJA SU COMPRA</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    function generarRecibo() {
+        const nombreCliente = document.getElementById('nombreClienteMensualidad').value;
+        const cuotaNumero = document.getElementById('cuotaNumero').value;
+        const costoEquipo = document.getElementById('costoEquipo').value;
+        const montoCuota = document.getElementById('montoCuota').value;
+        const contacto = document.getElementById('contacto').value;
+        const fechaPago = document.getElementById('fechaPago').value;
+
+        const saldoRestante = costoEquipo - (cuotaNumero * montoCuota);
+        document.getElementById('saldoRestante').value = `Q${saldoRestante.toFixed(2)}`;
+
+        document.getElementById('tituloGenerado').textContent = `Recibo de LENSOR - Mensualidad Cuota #${cuotaNumero}`;
+        document.getElementById('detalleRecibo').innerHTML = `
+            <p><span class="data">Cliente:</span> ${nombreCliente}</p>
+            <p><span class="data">Costo Total del Equipo:</span> Q${costoEquipo}</p>
+            <p><span class="data">Monto de la Cuota:</span> Q${montoCuota}</p>
+            <p><span class="data">Saldo Restante:</span> Q${saldoRestante.toFixed(2)}</p>
+            <p><span class="data">Contacto:</span> ${contacto}</p>
+            <p><span class="data">Fecha de Pago:</span> ${fechaPago}</p>
+        `;
+
+        document.getElementById('recibo').style.display = 'block';
+    }
+
+    function descargarImagen() {
+        const nombreCliente = document.getElementById('nombreClienteMensualidad').value;
+        const cuotaNumero = document.getElementById('cuotaNumero').value;
+        const fechaPago = document.getElementById('fechaPago').value;
+
+        const reciboElement = document.getElementById('recibo');
+        html2canvas(reciboElement, { backgroundColor: null }).then(function (canvas) {
+            const link = document.createElement('a');
+            link.download = `${nombreCliente}_CUOTA#${cuotaNumero}_${fechaPago}.png`; // Nombre del archivo
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+</script>
+
+</body>
+</html>
